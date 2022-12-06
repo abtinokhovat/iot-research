@@ -1,7 +1,7 @@
 FROM amd64/ubuntu:20.04
 LABEL "cloud.randd.team" = "ns3_3.36.1 image" \
     version = "1.0" \
-    description = "Base docker image of ns3 3.36.1 with Ubuntu 20.04 LTS" 
+    description = "Base docker image of ns3 3.7 with Ubuntu 20.04 LTS"
 
 # create ns3-user user
 RUN groupadd -r ns3-user && \
@@ -12,7 +12,7 @@ RUN echo "ns3-user:ns3-user" | chpasswd
 RUN apt update
 
 # 1.minimal requirements
-RUN DEBIAN_FRONTEND=noninteractive apt install -y g++ python3 cmake ninja-build git python3-pip 
+RUN DEBIAN_FRONTEND=noninteractive apt install -y g++ python3 cmake ninja-build git python3-pip
 
 # 2.Ccache is a compiler cache optimization that will speed up builds across multiple ns-3 directories, at the cost of up to an extra 5 GB of disk space used in the cache.
 RUN DEBIAN_FRONTEND=noninteractive apt install -y ccache
@@ -36,7 +36,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -y clang-format
 RUN DEBIAN_FRONTEND=noninteractive apt install -y doxygen graphviz imagemagick
 #RUN DEBIAN_FRONTEND=noninteractive apt install -y texlive texlive-extra-utils texlive-latex-extra texlive-font-utils dvipng latexmk
 
-# 9.The ns-3 manual and tutorial are written in reStructuredText for Sphinx (doc/tutorial, 
+# 9.The ns-3 manual and tutorial are written in reStructuredText for Sphinx (doc/tutorial,
 # doc/manual, doc/models), and figures typically in dia (also needs the texlive packages above):
 RUN DEBIAN_FRONTEND=noninteractive apt install -y python3-sphinx dia
 
@@ -63,11 +63,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -y vtun lxc uml-utilities
 
 # 17. Support for openflow module (requires libxml2-dev if not installed above) and Boost development libraries
 RUN DEBIAN_FRONTEND=noninteractive apt install -y libxml2 libxml2-dev libboost-all-dev
-  
+
 
 # install wget
-RUN DEBIAN_FRONTEND=noninteractive apt install -y \ 
-    wget           
+RUN DEBIAN_FRONTEND=noninteractive apt install -y \
+    wget
 
 #RUN mkdir -p /usr/ns3
 WORKDIR /usr
@@ -97,16 +97,16 @@ RUN hg clone http://code.nsnam.org/openflow && cd openflow && ./waf configure &&
 # 23. build cppyy
 USER ns3-user
 RUN python3 -m pip install --user cppyy
- 
+
 RUN ns-allinone-3.37/ns-3.37/ns3 configure \
 --build-profile=debug \
 --enable-examples \
 --enable-tests \
 --enable-python-binding \
---enable-mpi \ 
+--enable-mpi \
 --enable-dpdk \
 --with-brite=/usr/BRITE \
---with-openflow=/usr/openflow 
+--with-openflow=/usr/openflow
 #--with-click=/usr/click
 
 RUN ns-allinone-3.37/ns-3.37/ns3 build
