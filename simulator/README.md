@@ -19,51 +19,51 @@ _Networking funtionailty outside of docker container is not yet verified._
 # Docker file structure 
 ### **Ubuntu/Debian/Mint**
 
-The following list of packages should be accurate through the Ubuntu 22.10 release; other releases or other Debian-based systems may slightly vary. Ubuntu 16.04 LTS release is probably the oldest release that is known to work with the most recent ns-3 releases.
-
-The list of packages depends on which version of ns-3 you are trying to build.
-
-1. minimal requirements for release 3.36 and later:
+1. **minimal requirements for release 3.36 and later:**
     
     ```bash
-     apt install g++ python3 cmake ninja-build git python3-pip
+     apt install g++ python3 cmake ninja-build git python3-pip mercurial
     ```
     
 2. Ccache is a compiler cache optimization that will speed up builds across multiple ns-3 directories, at the cost of up to an extra 5 GB of disk space used in the cache.
     
-    ```bash 
+    ```bash
      apt install ccache
     ```
     
-3. minimal requirements for Python visualizer and bindings (ns-3.37 and newer): cppyy Python module and Pyviz dependencies
+3. **minimal requirements for Python visualizer and bindings (ns-3.37 and newer):** cppyy Python module and Pyviz dependencies
     
     ```bash
     python3 -m pip install --user cppyy
     apt install gir1.2-goocanvas-2.0 python3-gi python3-gi-cairo python3-pygraphviz gir1.2-gtk-3.0 ipython3 python3-setuptools
     ```
     
-4. Netanim animator: qt5 development tools are needed for Netanim animator; qt4 will also work but we have migrated to qt5. qt6 compatibility is not tested.
+4. **Netanim animator:** qt5 development tools are needed for Netanim animator; qt4 will also work but we have migrated to qt5. qt6 compatibility is not tested.
     
     ```bash
      apt install qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
     ```
     
 5. For ns-3.28 and earlier releases, PyViz is based on GTK+ 2, GooCanvas, and GraphViz:
+    
     ```bash
     apt install python-pygraphviz python-kiwi python-pygoocanvas libgoocanvas-dev ipython
     ```
     
 6. Support for MPI-based distributed emulation
+    
     ```bash
     apt install openmpi-bin openmpi-common openmpi-doc libopenmpi-dev
     ```
     
 7. Debugging:
+    
     ```bash
      apt install gdb valgrind
     ```
     
 8. Support for utils/check-style-clang-format.py code style check program (since ns-3.37):
+    
     ```bash
     apt install clang-format
     ```
@@ -120,12 +120,52 @@ The list of packages depends on which version of ns-3 you are trying to build.
     
 17. To experiment with virtual machines and ns-3
     
-    ```bash
+    ```
      apt install vtun lxc uml-utilities
     ```
     
 18. Support for openflow module (requires libxml2-dev if not installed above) and Boost development libraries
     
-    ```bash
+    ```
     apt install libxml2 libxml2-dev libboost-all-dev
     ```
+    
+19. For adding brite integration we have to build brite from a mercurial repository
+    
+    ```bash
+    hg clone http://code.nsnam.org/BRITE 
+    cd BRITE
+    make
+    ```
+    
+    [BRITE Integration - Model Library](https://www.nsnam.org/docs/models/html/brite.html)
+    
+20. For adding openflow integration we have to build openflow from a mercurial repository and from source code.
+    
+    ```bash
+    hg clone http://code.nsnam.org/openflow
+    cd openflow
+    ./waf configure
+    ./waf build
+    ```
+    
+    [OpenFlow switch support - Model Library](https://www.nsnam.org/docs/models/html/openflow-switch.html)
+    
+21. Dependencies of DPDK
+    
+    ```bash
+    apt-get -y install dpdk dpdk-dev libdpdk-dev dpdk-igb-uio-dkms
+    ```
+    
+    [DPDK NetDevice - Model Library](https://www.nsnam.org/docs/models/html/dpdk-net-device.html)
+    
+22. For building click module we have to build it from it’s repository
+    
+    ```bash
+    git clone https://github.com/kohler/click
+    cd click/
+    ./configure --disable-linuxmodule --enable-nsclick --enable-wifi
+    make
+    ```
+    
+    [Click Modular Router Integration - Model Library](https://www.nsnam.org/docs/models/html/click.html)

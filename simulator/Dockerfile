@@ -18,9 +18,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -y g++ python3 cmake ninja-build 
 RUN DEBIAN_FRONTEND=noninteractive apt install -y ccache
 
 # 3.minimal requirements for Python visualizer and bindings (ns-3.37 and newer): cppyy Python module and Pyviz dependencies
-USER ns3-user
-RUN python3 -m pip install --user cppyy
-USER root
 RUN DEBIAN_FRONTEND=noninteractive apt install -y gir1.2-goocanvas-2.0 python3-gi python3-gi-cairo python3-pygraphviz gir1.2-gtk-3.0 ipython3 python3-setuptools
 
 # 4.Netanim animator: qt5 development tools are needed for Netanim animator; qt4 will also work but we have migrated to qt5. qt6 compatibility is not tested.
@@ -95,16 +92,27 @@ RUN hg clone http://code.nsnam.org/BRITE && cd BRITE && make && cd ../
 RUN hg clone http://code.nsnam.org/openflow && cd openflow && ./waf configure && ./waf build && cd ../
 
 # 22. clone click and build
-RUN git clone https://github.com/kohler/click && cd click/ && ./configure --disable-linuxmodule --enable-nsclick --enable-wifi && make && cd ../
+# RUN git clone https://github.com/kohler/click && cd click/ && ./configure --disable-linuxmodule --enable-nsclick --enable-wifi && make && cd ../
 
+# 23. build cppyy
+USER ns3-user
+RUN python3 -m pip install --user cppyy
+ 
+RUN ns-allinone-3.37/ns-3.37/ns3 configure \
+--build-profile=debug \
+--enable-examples \
+--enable-tests \
+--enable-python-binding \
+--enable-mpi \ 
+--enable-dpdk \
+--with-brite=/usr/BRITE \
+--with-openflow=/usr/openflow 
+#--with-click=/usr/click
 
-# RUN cd ns-allinone-3.37/ns-3.37 
+RUN ns-allinone-3.37/ns-3.37/ns3 build
+USER root
+RUN ln -s /usr/ns-allinone-3.37/ns-3.37 /usr/ns3
 
-
-# RUN ./ns3 configure --build-profile=debug --disable-werror --enable-examples --enable-tests 
-
-# RUN ln -s /usr/ns-allinone-3.37/ns-3.37 /usr/ns3
-
-# RUN apt clean && \
-# 	rm -rf /var/lib/apt/lists/* && \
-# 	rm ns-allinone-3.37.tar.bz2
+RUN apt clean && \
+	rm -rf /var/lib/apt/lists/* && \
+	rm ns-allinone-3.37.tar.bz2
